@@ -5,7 +5,7 @@ import jwt
 from fastapi import Depends, FastAPI, HTTPException, status, APIRouter
 from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
 
-from jwt.exceptions import InvalidTokenError
+# from jwt.exceptions import InvalidTokenError
 import bcrypt
 # passlib 不維護了，如果用了會讓bcrypt報錯，所以直接改用bcrypt
 from pydantic import BaseModel

@@ -1,5 +1,7 @@
 from typing import Annotated
 from fastapi import Depends
+import os
+from dotenv import load_dotenv
 
 from sqlalchemy import create_engine
 from sqlalchemy.ext.declarative import declarative_base
@@ -7,10 +9,8 @@ from sqlalchemy.orm import sessionmaker, Session
 
 # 連接到的URL，這裡用postgresql舉例
 # postgresql://user:password@postgresserver/db
-SQLALCHEMY_DATABASE_URL = "postgresql://postgres:5yamzoOAlVlURyF8@34.80.59.7:5432/postgres"
-
-# 用create_engine對這個URL_DATABASE建立一個引擎
-engine = create_engine(SQLALCHEMY_DATABASE_URL)
+load_dotenv()
+engine = create_engine(os.getenv('SQLALCHEMY_DATABASE_URL'))
 
 # 使用sessionmaker來與資料庫建立一個對話，記得要bind=engine，這才會讓專案和資料庫連結
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)

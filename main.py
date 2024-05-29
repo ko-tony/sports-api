@@ -3,6 +3,7 @@ from typing import Union, Annotated
 
 from fastapi import FastAPI, HTTPException, Path, Depends
 from fastapi.encoders import jsonable_encoder
+from fastapi.middleware.cors import CORSMiddleware
 from routers import users
 
 from pydantic import BaseModel
@@ -19,6 +20,21 @@ class ModelName(str, Enum):
     lenet = "lenet"
 
 app = FastAPI()
+
+origins = [
+    "http://localhost.tiangolo.com",
+    "https://localhost.tiangolo.com",
+    "http://localhost",
+    "http://localhost:8080",
+]
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=origins,
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
 

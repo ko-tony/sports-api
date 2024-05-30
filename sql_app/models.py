@@ -22,6 +22,23 @@ class WestSemG7(Base):
     leftTeamScore = Column(Integer)
     rightTeamScore = Column(Integer)
 
+class WestFinalG4(Base):
+    __tablename__ = "west_final_g4"
+
+    leftTeam = Column(String, primary_key=True)
+    rightTeam = Column(String)
+    leftTeamScore = Column(Integer)
+    rightTeamScore = Column(Integer)
+
+class WestFinalG5(Base):
+    __tablename__ = "west_final_g5"
+
+    leftTeam = Column(String, primary_key=True)
+    rightTeam = Column(String)
+    leftTeamScore = Column(Integer)
+    rightTeamScore = Column(Integer)
+
+
 class User(Base):
     __tablename__ = "users"
 

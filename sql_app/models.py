@@ -38,6 +38,13 @@ class WestFinalG5(Base):
     leftTeamScore = Column(Integer)
     rightTeamScore = Column(Integer)
 
+class CwaUvLive(Base):
+    __tablename__ = "cwa_uv_live"
+
+    cityName = Column(String, primary_key=True)
+    uvIndex = Column(Integer)
+    date = Column(Date)
+
 
 class User(Base):
     __tablename__ = "users"

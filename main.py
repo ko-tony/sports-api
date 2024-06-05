@@ -86,3 +86,13 @@ async def get_west_final_g5(db: db_dependency):
     if not result:
         raise HTTPException(status_code=404, detail='This WestFinalG5 is not found...')
     return result
+
+@app.get("/cwa_uv_live", tags=["openAPI"])
+async def get_cwa_uv_live(db: db_dependency):
+    try:
+        result = db.query(models.CwaUvLive).all()
+    except Exception as e:
+        raise HTTPException(status_code=405, detail='Error...')
+    if not result:
+        raise HTTPException(status_code=404, detail='This CwaUvLive is not found...')
+    return result

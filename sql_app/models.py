@@ -44,6 +44,7 @@ class CwaUvLive(Base):
     cityName = Column(String, primary_key=True)
     uvIndex = Column(Integer)
     date = Column(Date)
+    weather = Column(String)
 
 
 class User(Base):

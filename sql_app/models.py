@@ -22,14 +22,6 @@ class WestSemG7(Base):
     leftTeamScore = Column(Integer)
     rightTeamScore = Column(Integer)
 
-class WestFinalG4(Base):
-    __tablename__ = "west_final_g4"
-
-    leftTeam = Column(String, primary_key=True)
-    rightTeam = Column(String)
-    leftTeamScore = Column(Integer)
-    rightTeamScore = Column(Integer)
-
 class WestFinalG5(Base):
     __tablename__ = "west_final_g5"
 
@@ -46,13 +38,19 @@ class CwaUvLive(Base):
     date = Column(Date)
     weather = Column(String)
 
+class MoenvLive(Base):
+    __tablename__ = "moenv_live"
 
-class User(Base):
-    __tablename__ = "users"
+    cityName = Column(String, primary_key=True)
+    aqi = Column(Integer)
+    date = Column(Date)
 
-    user_id = Column(Integer, primary_key=True, index=True)
-    username = Column(String, unique=True, index=True)
-    full_name = Column(String)
-    email = Column(String, unique=True, index=True)
-    hashed_password = Column(String)
-    disabled = Column(Boolean, default=False)
+# class User(Base):
+#     __tablename__ = "users"
+
+#     user_id = Column(Integer, primary_key=True, index=True)
+#     username = Column(String, unique=True, index=True)
+#     full_name = Column(String)
+#     email = Column(String, unique=True, index=True)
+#     hashed_password = Column(String)
+#     disabled = Column(Boolean, default=False)

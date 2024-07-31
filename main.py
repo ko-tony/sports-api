@@ -65,17 +65,6 @@ async def get_west_sem_g7(db: db_dependency):
         raise HTTPException(status_code=404, detail='This WestSem is not found...')
     return result
 
-@app.get("/west_final_g4", tags=["openAPI"])
-async def get_west_final_g4(db: db_dependency):
-    try:
-        result = db.query(models.WestFinalG4).all()
-    except Exception as e:
-        print(e)
-        raise HTTPException(status_code=405, detail='Error...')
-    if not result:
-        raise HTTPException(status_code=404, detail='This WestFinalG4 is not found...')
-    return result
-
 @app.get("/west_final_g5", tags=["openAPI"])
 async def get_west_final_g5(db: db_dependency):
     try:
@@ -95,4 +84,14 @@ async def get_cwa_uv_live(db: db_dependency):
         raise HTTPException(status_code=405, detail='Error...')
     if not result:
         raise HTTPException(status_code=404, detail='This CwaUvLive is not found...')
+    return result
+
+@app.get("/moenv_live", tags=["openAPI"])
+async def get_cwa_uv_live(db: db_dependency):
+    try:
+        result = db.query(models.MoenvLive).all()
+    except Exception as e:
+        raise HTTPException(status_code=405, detail='Error...')
+    if not result:
+        raise HTTPException(status_code=404, detail='This MoenvLive is not found...')
     return result

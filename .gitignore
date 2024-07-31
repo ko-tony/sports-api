@@ -20,4 +20,4 @@ htmlcov/
 docs/ebug
 videos
 __pycache__
-nbaenv/
+env/

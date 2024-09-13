@@ -14,22 +14,6 @@ class Weather(Base):
     prcp = Column(Integer)
     date = Column(Date)
 
-class WestSemG7(Base):
-    __tablename__ = "west_sem_g7"
-
-    leftTeam = Column(String, primary_key=True)
-    rightTeam = Column(String, primary_key=True)
-    leftTeamScore = Column(Integer)
-    rightTeamScore = Column(Integer)
-
-class WestFinalG5(Base):
-    __tablename__ = "west_final_g5"
-
-    leftTeam = Column(String, primary_key=True)
-    rightTeam = Column(String)
-    leftTeamScore = Column(Integer)
-    rightTeamScore = Column(Integer)
-
 class CwaUvLive(Base):
     __tablename__ = "cwa_uv_live"
 

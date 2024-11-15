@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Excel to Word Caller</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      margin: 0;
+      background-color: #f0f0f0;
+    }
+    .container {
+      text-align: center;
+      background-color: white;
+      padding: 2rem;
+      border-radius: 8px;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    }
+    button {
+      background-color: #4CAF50;
+      border: none;
+      color: white;
+      padding: 15px 32px;
+      text-align: center;
+      text-decoration: none;
+      display: inline-block;
+      font-size: 16px;
+      margin: 4px 2px;
+      cursor: pointer;
+      border-radius: 4px;
+    }
+    input[type="file"] {
+      margin-top: 1rem;
+    }
+    #status {
+      margin-top: 1rem;
+      font-weight: bold;
+    }
+  </style>
+  <script>
+    const API_URL = 'https://sports-api.me-pppmp.com/excel_to_word';
+
+    async function convertExcelToWord() {
+      const fileInput = document.getElementById('fileInput');
+      const statusElement = document.getElementById('status');
+      
+      if (!fileInput.files.length) {
+        statusElement.textContent = '請選擇一個文件';
+        return;
+      }
+
+      const formData = new FormData();
+      formData.append('file', fileInput.files[0]);
+
+      statusElement.textContent = '正在處理...';
+
+      try {
+        const response = await fetch(API_URL, {
+          method: 'POST',
+          body: formData
+        });
+
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+
+        const blob = await response.blob();
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.style.display = 'none';
+        a.href = url;
+        a.download = 'converted_documents.zip';
+        document.body.appendChild(a);
+        a.click();
+        window.URL.revokeObjectURL(url);
+
+        statusElement.textContent = '轉換成功！開始下載。';
+      } catch (error) {
+        console.error('轉換過程出錯:', error);
+        statusElement.textContent = '轉換失敗，請重試或找IT部門。';
+      }
+    }
+  </script>
+</head>
+<body>
+  <div class="container">
+    <h1>Excel to Word Caller</h1>
+    <input type="file" id="fileInput" accept=".xlsx,.xls">
+    <br>
+    <br>
+    <br>
+    <button onclick="convertExcelToWord()">開始轉換</button>
+    <div id="status"></div>
+  </div>
+</body>
+</html>

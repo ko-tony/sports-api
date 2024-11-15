@@ -66,7 +66,7 @@ async def get_cwa_uv_live(db: db_dependency):
     return result
 
 @app.get("/moenv_live", tags=["openAPI"])
-async def get_cwa_uv_live(db: db_dependency):
+async def get_moenv_uv_live(db: db_dependency):
     try:
         result = db.query(models.MoenvLive).all()
     except Exception as e:

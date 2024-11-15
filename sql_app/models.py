@@ -21,6 +21,7 @@ class CwaUvLive(Base):
     uvIndex = Column(Integer)
     date = Column(Date)
     weather = Column(String)
+    humidity = Column(Integer)
 
 class MoenvLive(Base):
     __tablename__ = "moenv_live"

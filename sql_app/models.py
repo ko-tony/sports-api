@@ -28,6 +28,8 @@ class MoenvLive(Base):
 
     cityName = Column(String, primary_key=True)
     aqi = Column(Integer)
+    pm25 = Column(Integer)
+    o3 = Column(Integer)
     date = Column(Date)
 
 # class User(Base):

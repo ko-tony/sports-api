@@ -74,3 +74,36 @@ async def get_moenv_uv_live(db: db_dependency):
     if not result:
         raise HTTPException(status_code=404, detail='This MoenvLive is not found...')
     return result
+
+@app.get("/env_live_1", tags=["openAPI"])
+async def get_environmental_data(db: db_dependency):
+    try:
+        # 聯合查詢兩個表的資料
+        result = db.query(
+            models.MoenvLive.cityName,
+            models.MoenvLive.aqi,
+            models.MoenvLive.pm25,
+            models.MoenvLive.date,
+            models.CwaUvLive.humidity
+        ).join(
+            models.CwaUvLive, 
+            models.MoenvLive.cityName == models.CwaUvLive.cityName
+        ).all()
+        
+        # 將查詢結果轉換為字典格式
+        environmental_data = []
+        for row in result:
+            environmental_data.append({
+                "cityName": row.cityName,
+                "aqi": row.aqi,
+                "pm25": row.pm25,
+                "date": row.date,
+                "humidity": row.humidity
+            })
+        
+        if not result:
+            raise HTTPException(status_code=404, detail='No environmental data found...')
+        
+        return environmental_data
+    except Exception as e:
+        raise HTTPException(status_code=405, detail='Error...')

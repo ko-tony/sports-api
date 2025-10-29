@@ -1,4 +1,5 @@
 from typing import Union, Annotated
+from sqlalchemy import func
 
 from fastapi import FastAPI, HTTPException, Path, Depends
 from fastapi.encoders import jsonable_encoder
@@ -76,9 +77,10 @@ async def get_moenv_uv_live(db: db_dependency):
     return result
 
 @app.get("/env_live_1", tags=["openAPI"])
-async def get_environmental_data(db: db_dependency):
+async def get_env_live_1(db: db_dependency):
     try:
         # 聯合查詢兩個表的資料
+        # MoenvLive 和 CwaUvLive cityName 差異在於一個有"市"字，一個沒有
         result = db.query(
             models.MoenvLive.cityName,
             models.MoenvLive.aqi,
@@ -87,7 +89,7 @@ async def get_environmental_data(db: db_dependency):
             models.CwaUvLive.humidity
         ).join(
             models.CwaUvLive, 
-            models.MoenvLive.cityName == models.CwaUvLive.cityName
+            func.replace(models.MoenvLive.cityName, "市", "") == models.CwaUvLive.cityName
         ).all()
         
         # 將查詢結果轉換為字典格式

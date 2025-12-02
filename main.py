@@ -76,7 +76,7 @@ async def get_moenv_uv_live(db: db_dependency):
         raise HTTPException(status_code=404, detail='This MoenvLive is not found...')
     return result
 
-@app.get("/env_live_1", tags=["openAPI"])
+@app.get("/env_live_1", tags=["openAPI"], summary="Lance要的", description="查空氣品質與溫濕度(環境部與中央氣象2表聯合查詢)")
 async def get_env_live_1(db: db_dependency):
     try:
         # 聯合查詢兩個表的資料
@@ -86,7 +86,8 @@ async def get_env_live_1(db: db_dependency):
             models.MoenvLive.aqi,
             models.MoenvLive.pm25,
             models.MoenvLive.date,
-            models.CwaUvLive.humidity
+            models.CwaUvLive.humidity,
+            models.CwaUvLive.airTemperature
         ).join(
             models.CwaUvLive, 
             func.replace(models.MoenvLive.cityName, "市", "") == models.CwaUvLive.cityName
@@ -100,7 +101,8 @@ async def get_env_live_1(db: db_dependency):
                 "aqi": row.aqi,
                 "pm25": row.pm25,
                 "date": row.date,
-                "humidity": row.humidity
+                "humidity": row.humidity,
+                "airTemperature": row.airTemperature
             })
         
         if not result:

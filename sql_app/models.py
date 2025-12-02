@@ -18,6 +18,7 @@ class CwaUvLive(Base):
     __tablename__ = "cwa_uv_live"
 
     cityName = Column(String, primary_key=True)
+    airTemperature = Column(Integer)
     uvIndex = Column(Integer)
     date = Column(Date)
     weather = Column(String)

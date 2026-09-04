@@ -3,7 +3,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy import text
 from sqlalchemy.exc import SQLAlchemyError
 
-from app.api.environment import legacy_router, v1_router
+from app.api.environment import v1_router
 from app.core.database import DatabaseSession
 
 app = FastAPI(
@@ -21,7 +21,6 @@ app.add_middleware(
 )
 
 app.include_router(v1_router)
-app.include_router(legacy_router)
 
 
 @app.get("/")

@@ -10,6 +10,19 @@ from sqlalchemy.exc import SQLAlchemyError
 from app.core.database import get_db
 from main import app
 
+SAMPLE_ROW = SimpleNamespace(
+    cityName="臺北市",
+    aqi=42,
+    pm25=Decimal("12.5"),
+    o3=Decimal("30"),
+    aqiDate=date(2026, 9, 3),
+    airTemperature=28.5,
+    humidity=70,
+    uvIndex=6,
+    weather="晴",
+    weatherDate=datetime(2026, 9, 3, 12, 0),
+)
+
 
 class ApiContractTest(unittest.TestCase):
     @classmethod
@@ -22,22 +35,18 @@ class ApiContractTest(unittest.TestCase):
     def tearDownClass(cls) -> None:
         app.dependency_overrides.clear()
 
-    def test_legacy_data_paths_remain_available(self) -> None:
-        for path in ("/cwa_uv_live", "/moenv_live", "/env_live_1"):
-            with self.subTest(path=path):
-                self.assertIn(path, self.paths)
+    def test_environment_is_the_only_data_path(self) -> None:
+        data_paths = [path for path in self.paths if path.startswith("/api/")]
 
-    def test_versioned_data_paths_are_available(self) -> None:
-        for path in (
-            "/api/v1/cwa-uv-live",
-            "/api/v1/air-quality",
-            "/api/v1/environment",
-        ):
-            with self.subTest(path=path):
-                self.assertIn(path, self.paths)
+        self.assertEqual(data_paths, ["/api/v1/environment"])
 
     def test_removed_features_are_not_exposed(self) -> None:
         for path in (
+            "/cwa_uv_live",
+            "/moenv_live",
+            "/env_live_1",
+            "/api/v1/cwa-uv-live",
+            "/api/v1/air-quality",
             "/register",
             "/token",
             "/excel_to_word",
@@ -54,74 +63,50 @@ class ApiContractTest(unittest.TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.json(), {"status": "ok"})
 
-    @patch("app.services.environment.repository.list_cwa_uv_live")
-    def test_legacy_and_versioned_cwa_contracts_match(self, list_cwa) -> None:
-        list_cwa.return_value = [
-            SimpleNamespace(
-                cityName="臺北",
-                airTemperature=28.5,
-                uvIndex=6,
-                date=datetime(2026, 9, 3, 12, 0),
-                weather="晴",
-                humidity=70,
-            )
-        ]
-
-        legacy = self.client.get("/cwa_uv_live")
-        versioned = self.client.get("/api/v1/cwa-uv-live")
-
-        self.assertEqual(legacy.json(), versioned.json())
-        self.assertEqual(legacy.json()[0]["airTemperature"], 28.5)
-        self.assertEqual(legacy.json()[0]["date"], "2026-09-03T12:00:00")
-        self.assertIn("s-maxage=300", legacy.headers["cache-control"])
-
-    @patch("app.services.environment.repository.list_air_quality")
-    def test_legacy_and_versioned_air_quality_contracts_match(
-        self, list_air_quality
-    ) -> None:
-        list_air_quality.return_value = [
-            SimpleNamespace(
-                cityName="臺北市",
-                aqi=42,
-                pm25=Decimal("12.5"),
-                o3=Decimal("30"),
-                date=date(2026, 9, 3),
-            )
-        ]
-
-        legacy = self.client.get("/moenv_live")
-        versioned = self.client.get("/api/v1/air-quality")
-
-        self.assertEqual(legacy.json(), versioned.json())
-        self.assertEqual(legacy.json()[0]["pm25"], 12.5)
-
     @patch("app.services.environment.repository.list_environment")
-    def test_legacy_and_versioned_environment_contracts_match(
+    def test_environment_returns_merged_air_quality_and_weather(
         self, list_environment
     ) -> None:
-        list_environment.return_value = [
-            SimpleNamespace(
-                cityName="臺北市",
-                aqi=42,
-                pm25=Decimal("12.5"),
-                date=date(2026, 9, 3),
-                humidity=70,
-                airTemperature=28.5,
-            )
-        ]
+        list_environment.return_value = [SAMPLE_ROW]
 
-        legacy = self.client.get("/env_live_1")
-        versioned = self.client.get("/api/v1/environment")
+        response = self.client.get("/api/v1/environment")
 
-        self.assertEqual(legacy.json(), versioned.json())
-        self.assertEqual(legacy.json()[0]["date"], "2026-09-03")
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(
+            response.json(),
+            [
+                {
+                    "cityName": "臺北市",
+                    "aqi": 42,
+                    "pm25": 12.5,
+                    "o3": 30.0,
+                    "aqiDate": "2026-09-03",
+                    "airTemperature": 28.5,
+                    "humidity": 70,
+                    "uvIndex": 6,
+                    "weather": "晴",
+                    "weatherDate": "2026-09-03T12:00:00",
+                }
+            ],
+        )
+        self.assertIn("s-maxage=300", response.headers["cache-control"])
 
-    @patch("app.services.environment.repository.list_cwa_uv_live")
-    def test_database_errors_return_service_unavailable(self, list_cwa) -> None:
-        list_cwa.side_effect = SQLAlchemyError("unavailable")
+    @patch("app.services.environment.repository.list_environment")
+    def test_empty_result_returns_not_found(self, list_environment) -> None:
+        list_environment.return_value = []
+
+        response = self.client.get("/api/v1/environment")
+
+        self.assertEqual(response.status_code, 404)
+
+    @patch("app.services.environment.repository.list_environment")
+    def test_database_errors_return_service_unavailable(
+        self, list_environment
+    ) -> None:
+        list_environment.side_effect = SQLAlchemyError("unavailable")
 
         with self.assertLogs("app.services.environment", level="ERROR"):
-            response = self.client.get("/cwa_uv_live")
+            response = self.client.get("/api/v1/environment")
 
         self.assertEqual(response.status_code, 503)
         self.assertEqual(

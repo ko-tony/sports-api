@@ -4,13 +4,13 @@ PPPMP 廣告使用的公開附屬資料 API。目前提供天氣與空氣品質�
 
 ## API
 
-新功能使用 `/api/v1`：
+對外只有一支資料 endpoint：
 
-- `GET /api/v1/cwa-uv-live`
-- `GET /api/v1/air-quality`
 - `GET /api/v1/environment`
 
-廣告仍在使用的 `/cwa_uv_live`、`/moenv_live`、`/env_live_1` 會維持相同 response，並在 OpenAPI 標記為 deprecated。`/weather`、帳號、OAuth 測試與 Excel 轉 Word 功能已移除。
+回傳各縣市的空氣品質與天氣即時值（`cityName`、`aqi`、`pm25`、`o3`、`aqiDate`、`airTemperature`、`humidity`、`uvIndex`、`weather`、`weatherDate`），資料由 `moenv_live` 與 `cwa_uv_live` 依縣市 JOIN 而成。兩表縣市名格式不同（`臺北市` / `臺北`），JOIN 時以 `replace(cityName, '市', '')` 對齊。
+
+舊路徑 `/cwa_uv_live`、`/moenv_live`、`/env_live_1` 與 `/api/v1/cwa-uv-live`、`/api/v1/air-quality` 已移除。`/weather`、帳號、OAuth 測試與 Excel 轉 Word 功能亦已移除。
 
 ## 本機執行
 

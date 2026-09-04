@@ -7,7 +7,7 @@ from app.api.environment import v1_router
 from app.core.database import DatabaseSession
 
 app = FastAPI(
-    title="PPPMP Data API",
+    title="Realtime API for PPPMP ads",
     description="Public supplementary data API for PPPMP ads.",
     version="1.0.0",
 )
@@ -23,7 +23,7 @@ app.add_middleware(
 app.include_router(v1_router)
 
 
-@app.get("/")
+@app.get("/", include_in_schema=False)
 def read_root() -> dict[str, str]:
     return {"Hello": "World"}
 

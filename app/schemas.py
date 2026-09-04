@@ -1,4 +1,4 @@
-from datetime import date, datetime
+from datetime import datetime
 
 from pydantic import BaseModel, ConfigDict
 
@@ -12,7 +12,7 @@ class EnvironmentResponse(BaseModel):
     aqi: int | None
     pm25: int | float | None
     o3: int | float | None
-    aqiDate: date | None
+    aqiDate: datetime | None
     airTemperature: float | None
     humidity: int | None
     uvIndex: int | None

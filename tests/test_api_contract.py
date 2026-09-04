@@ -1,5 +1,5 @@
 import unittest
-from datetime import date, datetime
+from datetime import datetime, timedelta, timezone
 from decimal import Decimal
 from types import SimpleNamespace
 from unittest.mock import patch
@@ -15,12 +15,12 @@ SAMPLE_ROW = SimpleNamespace(
     aqi=42,
     pm25=Decimal("12.5"),
     o3=Decimal("30"),
-    aqiDate=date(2026, 9, 3),
+    aqiDate=datetime(2026, 9, 3, 15, 0, tzinfo=timezone(timedelta(hours=8))),
     airTemperature=28.5,
     humidity=70,
     uvIndex=6,
     weather="晴",
-    weatherDate=datetime(2026, 9, 3, 12, 0),
+    weatherDate=datetime(2026, 9, 3, 12, 0, tzinfo=timezone(timedelta(hours=8))),
 )
 
 
@@ -80,12 +80,12 @@ class ApiContractTest(unittest.TestCase):
                     "aqi": 42,
                     "pm25": 12.5,
                     "o3": 30.0,
-                    "aqiDate": "2026-09-03",
+                    "aqiDate": "2026-09-03T15:00:00+08:00",
                     "airTemperature": 28.5,
                     "humidity": 70,
                     "uvIndex": 6,
                     "weather": "晴",
-                    "weatherDate": "2026-09-03T12:00:00",
+                    "weatherDate": "2026-09-03T12:00:00+08:00",
                 }
             ],
         )

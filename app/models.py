@@ -1,6 +1,6 @@
-from datetime import date, datetime
+from datetime import datetime
 
-from sqlalchemy import Date, DateTime, Float, Integer, Numeric, String
+from sqlalchemy import DateTime, Float, Integer, Numeric, String
 from sqlalchemy.orm import Mapped, mapped_column
 
 from app.core.database import Base
@@ -12,7 +12,7 @@ class CwaUvLive(Base):
     cityName: Mapped[str] = mapped_column(String, primary_key=True)
     airTemperature: Mapped[float | None] = mapped_column(Float)
     uvIndex: Mapped[int | None] = mapped_column(Integer)
-    date: Mapped[datetime | None] = mapped_column(DateTime)
+    date: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
     weather: Mapped[str | None] = mapped_column(String)
     humidity: Mapped[int | None] = mapped_column(Integer)
 
@@ -24,4 +24,4 @@ class MoenvLive(Base):
     aqi: Mapped[int | None] = mapped_column(Integer)
     pm25: Mapped[float | None] = mapped_column(Numeric)
     o3: Mapped[float | None] = mapped_column(Numeric)
-    date: Mapped[date | None] = mapped_column(Date)
+    date: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))

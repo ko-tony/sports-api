@@ -1,4 +1,6 @@
 import logging
+from datetime import datetime
+from zoneinfo import ZoneInfo
 
 import functions_framework
 import requests
@@ -23,6 +25,10 @@ SITE_IDS = {
 
 COLUMNS = ("cityName", "aqi", "pm25", "o3", "date")
 
+# 環境部的 publishtime 沒有時區資訊，實際是台北當地時間
+TAIPEI = ZoneInfo("Asia/Taipei")
+PUBLISHTIME_FORMATS = ("%Y/%m/%d %H:%M:%S", "%Y-%m-%d %H:%M:%S", "%Y-%m-%d %H:%M")
+
 
 def _fetch() -> list[dict]:
     params = {"api_key": required("MOENV_API_KEY")}
@@ -40,13 +46,22 @@ def _value(station: dict, key: str) -> str | None:
     return value if value not in ("", None) else None
 
 
+def _parse_publishtime(raw: str) -> datetime:
+    for fmt in PUBLISHTIME_FORMATS:
+        try:
+            return datetime.strptime(raw.strip(), fmt).replace(tzinfo=TAIPEI)
+        except ValueError:
+            continue
+    raise ValueError(f"無法解析 publishtime: {raw!r}")
+
+
 def _to_row(station: dict) -> tuple:
     return (
         station["county"],
         _value(station, "aqi"),
         _value(station, "pm2.5"),
         _value(station, "o3"),
-        station["publishtime"],
+        _parse_publishtime(station["publishtime"]),
     )
 
 

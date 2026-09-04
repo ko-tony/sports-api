@@ -2,6 +2,7 @@ import os
 from dataclasses import dataclass
 
 from dotenv import load_dotenv
+from sqlalchemy.engine import make_url
 
 load_dotenv()
 
@@ -11,6 +12,43 @@ def _int_setting(name: str, default: int, minimum: int) -> int:
     if value < minimum:
         raise ValueError(f"{name} must be {minimum} or greater")
     return value
+
+
+def _validate_db_sslmode(database_url: str, db_sslmode: str) -> None:
+    encrypted_sslmodes = {
+        "require",
+        "verify-ca",
+        "verify-full",
+    }
+    if db_sslmode in encrypted_sslmodes:
+        return
+
+    if db_sslmode == "disable":
+        database = make_url(database_url)
+        socket_host = database.query.get("host")
+        connection_name = (
+            socket_host.removeprefix("/cloudsql/")
+            if isinstance(socket_host, str)
+            else ""
+        )
+        is_cloud_sql_socket = (
+            database.drivername.startswith("postgresql")
+            and database.host is None
+            and set(database.query) == {"host"}
+            and isinstance(socket_host, str)
+            and socket_host.startswith("/cloudsql/")
+            and connection_name.count(":") == 2
+            and "/" not in connection_name
+            and "," not in connection_name
+        )
+        if is_cloud_sql_socket:
+            return
+        raise ValueError(
+            "DB_SSLMODE=disable is only allowed with a Cloud SQL Unix Socket"
+        )
+
+    allowed_sslmodes = sorted(encrypted_sslmodes | {"disable"})
+    raise ValueError(f"DB_SSLMODE must be one of {allowed_sslmodes}")
 
 
 @dataclass(frozen=True)
@@ -42,13 +80,7 @@ def load_settings() -> Settings:
         raise RuntimeError("SQLALCHEMY_DATABASE_URL is required")
 
     db_sslmode = os.getenv("DB_SSLMODE", "require")
-    allowed_sslmodes = {
-        "require",
-        "verify-ca",
-        "verify-full",
-    }
-    if db_sslmode not in allowed_sslmodes:
-        raise ValueError(f"DB_SSLMODE must be one of {sorted(allowed_sslmodes)}")
+    _validate_db_sslmode(database_url, db_sslmode)
 
     return Settings(
         database_url=database_url,

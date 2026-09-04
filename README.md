@@ -27,6 +27,8 @@ SHARED_CACHE_SECONDS=300
 STALE_WHILE_REVALIDATE_SECONDS=600
 ```
 
+直接 TCP 連線使用 `require`、`verify-ca` 或 `verify-full`。Cloud Run 透過 Cloud SQL Unix Socket 連線時，URL 使用 `?host=/cloudsql/PROJECT:REGION:INSTANCE`，並設定 `DB_SSLMODE=disable`；此處的 `disable` 只關閉 container 到本機 socket 的 libpq TLS，Cloud SQL 整合仍負責 socket 後端連線的加密與授權。程式會拒絕一般 TCP URL 使用 `disable`。
+
 啟動與測試：
 
 ```bash

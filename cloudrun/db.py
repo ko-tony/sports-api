@@ -20,6 +20,8 @@ def upsert_rows(
     columns: Sequence[str],
     conflict_column: str,
     rows: Sequence[Sequence[Any]],
+    *,
+    freshness_column: str | None = None,
 ) -> int:
     """依 conflict_column 做 upsert，回傳寫入筆數。
 
@@ -44,9 +46,17 @@ def upsert_rows(
         ),
     )
 
+    if freshness_column is not None:
+        if freshness_column not in columns:
+            raise ValueError("freshness_column must be in columns")
+        statement += sql.SQL(" WHERE EXCLUDED.{date} >= {table}.{date}").format(
+            date=sql.Identifier(freshness_column), table=sql.Identifier(table),
+        )
+
     with psycopg2.connect(**db_connection_kwargs()) as connection:
         with connection.cursor() as cursor:
             cursor.executemany(statement, rows)
+            count = cursor.rowcount
 
-    logger.info("已寫入 %s 筆資料到 %s", len(rows), table)
-    return len(rows)
+    logger.info("已寫入 %s 筆資料到 %s", count, table)
+    return count

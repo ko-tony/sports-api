@@ -35,10 +35,10 @@ class ApiContractTest(unittest.TestCase):
     def tearDownClass(cls) -> None:
         app.dependency_overrides.clear()
 
-    def test_environment_is_the_only_data_path(self) -> None:
+    def test_public_data_paths(self) -> None:
         data_paths = [path for path in self.paths if path.startswith("/api/")]
 
-        self.assertEqual(data_paths, ["/api/v1/environment"])
+        self.assertEqual(data_paths, ["/api/v1/environment", "/api/v1/finance"])
 
     def test_removed_features_are_not_exposed(self) -> None:
         for path in (

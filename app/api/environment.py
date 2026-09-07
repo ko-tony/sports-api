@@ -6,7 +6,7 @@ from app.core.database import DatabaseSession
 from app.schemas import EnvironmentResponse
 from app.services import environment as service
 
-v1_router = APIRouter(prefix="/api/v1", tags=["environment"])
+v1_router = APIRouter(prefix="/api/v1", tags=["天氣相關"])
 
 
 @v1_router.get(

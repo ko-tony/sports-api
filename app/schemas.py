@@ -1,6 +1,7 @@
 from datetime import datetime
 
 from pydantic import BaseModel, ConfigDict
+from typing import Literal
 
 
 class EnvironmentResponse(BaseModel):
@@ -18,3 +19,18 @@ class EnvironmentResponse(BaseModel):
     uvIndex: int | None
     weather: str | None
     weatherDate: datetime | None
+
+
+class FinanceResponse(BaseModel):
+    """大盤開盤每三分鐘抓一次，收盤後不抓。(機關有些許延遲)"""
+
+    model_config = ConfigDict(from_attributes=True)
+
+    symbol: str
+    name: str
+    index: float
+    change: float | None
+    turnover: float
+    turnoverUnit: Literal["億元"] = "億元"
+    date: datetime
+    fetchedAt: datetime

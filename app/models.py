@@ -25,3 +25,15 @@ class MoenvLive(Base):
     pm25: Mapped[float | None] = mapped_column(Numeric)
     o3: Mapped[float | None] = mapped_column(Numeric)
     date: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
+
+
+class FinanceLive(Base):
+    __tablename__ = "finance_live"
+
+    symbol: Mapped[str] = mapped_column(String, primary_key=True)
+    name: Mapped[str] = mapped_column(String)
+    index: Mapped[float] = mapped_column(Numeric(12, 2))
+    change: Mapped[float | None] = mapped_column(Numeric(12, 2))
+    turnover: Mapped[float] = mapped_column(Numeric(20, 8))
+    date: Mapped[datetime] = mapped_column(DateTime(timezone=True))
+    fetchedAt: Mapped[datetime] = mapped_column(DateTime(timezone=True))

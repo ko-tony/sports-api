@@ -4,6 +4,7 @@ from sqlalchemy import text
 from sqlalchemy.exc import SQLAlchemyError
 
 from app.api.environment import v1_router
+from app.api.finance import v1_router as finance_router
 from app.core.database import DatabaseSession
 
 app = FastAPI(
@@ -21,6 +22,7 @@ app.add_middleware(
 )
 
 app.include_router(v1_router)
+app.include_router(finance_router)
 
 
 @app.get("/", include_in_schema=False)
